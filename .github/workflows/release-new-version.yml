@@ -55,6 +55,7 @@ jobs:
             - name: Push changes and create Pull Request
               uses: peter-evans/create-pull-request@v4
               with:
+                  base: trunk
                   branch: ${{ steps.create-branch.outputs.BRANCH_NAME }}
                   commit-message: 'Version bump & changelog update'
                   title: 'Release update: ${{ github.event.inputs.release_type }}'
