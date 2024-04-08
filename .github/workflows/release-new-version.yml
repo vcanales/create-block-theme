@@ -1,0 +1,53 @@
+name: Release new version
+
+on:
+    workflow_dispatch:
+        inputs:
+            release_type:
+                description: 'Release type'
+                required: true
+                type: choice
+                options:
+                    - major
+                    - minor
+                    - patch
+
+jobs:
+    prepare-release:
+        if: github.event_name == 'workflow_dispatch'
+        name: Prepare Release PR
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+
+            - name: Install node dependencies
+              run: npm install
+
+            - name: Compile Javascript App
+              run: npm run build
+
+            - name: Create version update branch
+              run: |
+                  BRANCH_NAME="update/$(date +%Y-%m-%d)/${{ github.event.inputs.release_type }}-release"
+                  git checkout -b $BRANCH_NAME
+
+            - name: Update version and changelog
+              run: npm run update-version
+              env:
+                  RELEASE_TYPE: ${{ github.event.inputs.release_type }}
+
+            - name: Push changes and create Pull Request
+              uses: peter-evans/create-pull-request@v4
+              with:
+                  branch: ${{ env.BRANCH_NAME }}
+                  commit-message: 'Version bump & changelog update'
+                  title: 'Release update: ${{ github.event.inputs.release_type }}'
+                  body: 'This PR includes updates for a new ${{ github.event.inputs.release_type }} release.'
+                  labels: release
+                  token: ${{ secrets.GITHUB_TOKEN }}
