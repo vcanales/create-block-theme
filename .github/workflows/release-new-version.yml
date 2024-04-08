@@ -65,6 +65,7 @@ jobs:
                   --head ${{ steps.create-branch.outputs.BRANCH_NAME }} \
                   --label "Release: ${{ github.event.inputs.release_type }}" \
                   --body "
-                    ⚠️ This is a release PR for version *${{ steps.update-version.outputs.NEW_VERSION }}*.\n
-                    It updates the version of the Plugin and adds changes since the last tag to the Changelog file.\n
+                    ### Release PR ⚠️🤖
+                    This is a release PR for version **${{ steps.update-version.outputs.NEW_VERSION }}**, run by **${{ github.actor }}**.
+                    It updates the version of the Plugin and adds changes since the last tag to the Changelog file.
                     Merging this PR will trigger a new release and update the Plugin in the WordPress Plugin Directory."
