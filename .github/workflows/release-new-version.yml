@@ -53,12 +53,5 @@ jobs:
                   git push --set-upstream origin ${{ steps.create-branch.outputs.BRANCH_NAME }}
 
             - name: Push changes and create Pull Request
-              uses: peter-evans/create-pull-request@v4
-              with:
-                  base: trunk
-                  branch: ${{ steps.create-branch.outputs.BRANCH_NAME }}
-                  commit-message: 'Version bump & changelog update'
-                  title: 'Release update: ${{ github.event.inputs.release_type }}'
-                  body: 'This PR includes updates for a new ${{ github.event.inputs.release_type }} release.'
-                  labels: release
-                  token: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh pr create --title "Release ${{ github.event.inputs.release_type }}" --body "Release ${{ github.event.inputs.release_type }}" --base trunk --head ${{ steps.create-branch.outputs.BRANCH_NAME }}
