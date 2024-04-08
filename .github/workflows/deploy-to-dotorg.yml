@@ -35,7 +35,7 @@ jobs:
 
             - name: Get New Version
               id: get-version
-              run: echo "::set-output name=VERSION::$(node -p "require('./package.json').version")"
+              run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
             - name: Create Tag and Release on GitHub
               env:
