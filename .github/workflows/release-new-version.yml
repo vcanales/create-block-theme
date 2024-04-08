@@ -33,9 +33,11 @@ jobs:
               run: npm run build
 
             - name: Create version update branch
+              id: create-branch
               run: |
                   BRANCH_NAME="update/$(date +%Y-%m-%d)/${{ github.event.inputs.release_type }}-release"
                   git checkout -b $BRANCH_NAME
+                  echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
             - name: Update version and changelog
               run: npm run update-version
@@ -48,12 +50,12 @@ jobs:
                   git config user.email 'github-actions[bot]@users.noreply.github.com'
                   git add .
                   git commit -m "Version bump & changelog update" --no-verify
-                  git push --set-upstream origin ${{ env.BRANCH_NAME }}
+                  git push --set-upstream origin ${{ steps.create-branch.outputs.BRANCH_NAME }}
 
             - name: Push changes and create Pull Request
               uses: peter-evans/create-pull-request@v4
               with:
-                  branch: ${{ env.BRANCH_NAME }}
+                  branch: ${{ steps.create-branch.outputs.BRANCH_NAME }}
                   commit-message: 'Version bump & changelog update'
                   title: 'Release update: ${{ github.event.inputs.release_type }}'
                   body: 'This PR includes updates for a new ${{ github.event.inputs.release_type }} release.'
